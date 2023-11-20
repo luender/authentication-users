@@ -1,12 +1,12 @@
-import knex, { Knex } from "knex";
+import knex, { type Knex } from 'knex'
 
-import * as knexfile from "../../knexfile";
+import * as knexfile from '../../knexfile'
 
-let db: Knex;
-export default function getDbConn(): Knex {
+let db: Knex
+export default function getDbConn (): Knex {
   if (!db) {
-    db = knex(knexfile);
+    db = knex(knexfile)
   }
 
-  return db;
+  return db
 }

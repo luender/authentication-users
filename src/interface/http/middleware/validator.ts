@@ -1,10 +1,10 @@
-import { AnySchema } from "joi";
-import { curryN } from "ramda";
+import { type AnySchema } from 'joi'
+import { curryN } from 'ramda'
 
-import { BadRequestError } from "../../../util/http";
-import Logger from "../../../util/logger";
+import { BadRequestError } from '../../../util/http'
+import Logger from '../../../util/logger'
 
-import { HttpRequest, HttpResponse, HttpNext } from "../../../types/interface";
+import { type HttpRequest, type HttpResponse, type HttpNext } from '../../../types/interface'
 
 export const validator = curryN(
   4,
@@ -12,22 +12,22 @@ export const validator = curryN(
     const validation = schema.validate(req, {
       abortEarly: false,
       stripUnknown: true,
-      allowUnknown: true,
-    });
+      allowUnknown: true
+    })
 
     if (validation.error) {
       Logger.error({
-        class: "Validator",
-        classType: "HttpMiddleware",
-        details: validation.error.details,
-      });
-      return next(
-        new BadRequestError("Invalid request params.", validation.error.details)
-      );
+        class: 'Validator',
+        classType: 'HttpMiddleware',
+        details: validation.error.details
+      })
+      next(
+        new BadRequestError('Invalid request params.', validation.error.details)
+      ); return
     }
 
-    Object.assign(req, validation.value);
+    Object.assign(req, validation.value)
 
-    return next();
+    next()
   }
-);
+)

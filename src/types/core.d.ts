@@ -1,19 +1,19 @@
-import { IUserService, IUserUseCase } from "./user";
+import { type IUserService, type IUserUseCase } from "./user";
 
-import { Container as infraContainer } from "./infrastructure";
+import { type Container as infraContainer } from "./infrastructure";
 
-export type Container = {
+export interface Container {
   userUseCase: IUserUseCase;
-};
+}
 
-export type ContainerConfig = {
+export interface ContainerConfig {
   userRepository: infraContainer["userRepository"];
-};
+}
 
-export type ServiceContext = {
+export interface ServiceContext {
   userRepository: ContainerConfig["userRepository"];
-};
+}
 
-export type UseCaseContext = {
+export interface UseCaseContext {
   userService: IUserService;
-};
+}

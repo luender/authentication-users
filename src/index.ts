@@ -3,12 +3,12 @@ import Logger from "./util/logger";
 
 import { createContainer } from "./interface/container";
 
-type AppConfig = {
+interface AppConfig {
   http?: boolean;
-};
+}
 
 export class App {
-  private http?: boolean;
+  private readonly http?: boolean;
 
   constructor({ http }: AppConfig) {
     this.http = http;
@@ -35,4 +35,5 @@ const app = new App({
 setImmediate(() => {
   app.run();
   Logger.debug("app initialized");
+  console.log("rodou, deu bom");
 });

@@ -3,11 +3,18 @@ import httpStatusCodes from "http-status-codes";
 
 import {
   BadRequestError,
+  EmailExisting,
   InternalServerError,
   NotFoundError,
+  PasswordIsNotEqual,
+  UserExisting,
 } from "../../../util/http";
 
-import { HttpRequest, HttpResponse, HttpNext } from "../../../types/interface";
+import {
+  type HttpRequest,
+  type HttpResponse,
+  type HttpNext,
+} from "../../../types/interface";
 
 export const errorHandler = (
   err: any,
@@ -23,7 +30,12 @@ export const errorHandler = (
     throwErr = new NotFoundError(throwErr.message);
   }
 
-  if (err instanceof BadRequestError) {
+  if (
+    err instanceof BadRequestError ||
+    err instanceof UserExisting ||
+    err instanceof EmailExisting ||
+    err instanceof PasswordIsNotEqual
+  ) {
     status = httpStatusCodes.BAD_REQUEST;
     throwErr = new BadRequestError(throwErr.message, throwErr.details);
   }

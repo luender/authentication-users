@@ -1,28 +1,26 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { IUserRepository } from "./user";
-import { Knex } from "knex";
+import { type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import { type IUserRepository } from './user'
+import { type Knex } from 'knex'
 
 export interface IHttpAdapter {
-  send(config: AxiosRequestConfig): Promise<AxiosResponse>;
+  send: (config: AxiosRequestConfig) => Promise<AxiosResponse>
 }
 
-export interface IHttpAdapterConstructs {
-  new (config: AxiosRequestConfig): IHttpAdapter;
+export type IHttpAdapterConstructs = new (config: AxiosRequestConfig) => IHttpAdapter
+
+export type MysqlDatabase = Knex
+
+export interface MysqlAdapterConfig {
+  dbConn: MysqlDatabase
 }
-
-export type MysqlDatabase = Knex;
-
-export type MysqlAdapterConfig = {
-  dbConn: MysqlDatabase;
-};
 
 export interface IMysqlAdapter {
-  db: Knex.QueryBuilder;
-  tableName: string;
+  db: Knex.QueryBuilder
+  tableName: string
 }
 
-export type Container = {
-  userRepository: IUserRepository;
-};
+export interface Container {
+  userRepository: IUserRepository
+}
 
-export type ContainerConfig = Container;
+export type ContainerConfig = Container

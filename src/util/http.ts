@@ -1,6 +1,6 @@
 class CustomError extends Error {
-  private code: string;
-  private details: CustomError[] | null;
+  private readonly code: string;
+  private readonly details: CustomError[] | null;
 
   constructor(
     code: string,
@@ -29,5 +29,23 @@ export class InternalServerError extends CustomError {
 export class NotFoundError extends CustomError {
   constructor(message: string, details: null | any[] = null) {
     super("NOT_FOUND", message, details);
+  }
+}
+
+export class UserExisting extends CustomError {
+  constructor(message: string, details: null | any[] = null) {
+    super("USER_EXISTING", message, details);
+  }
+}
+
+export class EmailExisting extends CustomError {
+  constructor(message: string, details: null | any[] = null) {
+    super("EMAIL_EXISTING", message, details);
+  }
+}
+
+export class PasswordIsNotEqual extends CustomError {
+  constructor(message: string, details: null | any[] = null) {
+    super("PASSWORD_IS_NOT_EQUAL", message, details);
   }
 }

@@ -1,11 +1,11 @@
-import winston from "winston";
+import winston from 'winston'
 
-const consoleTransport = new winston.transports.Console();
+const consoleTransport = new winston.transports.Console()
 
 const myWinstonOptions = {
-  transports: [consoleTransport],
-};
+  transports: [consoleTransport]
+}
 
-const Logger = winston.createLogger(myWinstonOptions);
+const Logger = winston.createLogger(myWinstonOptions)
 
-export default Logger;
+export default Logger
