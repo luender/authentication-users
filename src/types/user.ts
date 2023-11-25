@@ -1,3 +1,5 @@
+import { Token } from "./auth";
+
 export type User = {
   name: string;
   lastName: string;
@@ -9,6 +11,8 @@ export type User = {
 
 export interface IUserUseCase {
   createUser(params: User): Promise<void>;
+
+  authUser(params: Partial<User>): Promise<Token>;
 }
 
 export interface IUserService {

@@ -32,13 +32,13 @@ export class NotFoundError extends CustomError {
   }
 }
 
-export class UserExisting extends CustomError {
+export class UserAlreadyExists extends CustomError {
   constructor(message: string, details: null | any[] = null) {
     super("USER_EXISTING", message, details);
   }
 }
 
-export class EmailExisting extends CustomError {
+export class EmailAlreadyExists extends CustomError {
   constructor(message: string, details: null | any[] = null) {
     super("EMAIL_EXISTING", message, details);
   }
@@ -47,5 +47,11 @@ export class EmailExisting extends CustomError {
 export class PasswordIsNotEqual extends CustomError {
   constructor(message: string, details: null | any[] = null) {
     super("PASSWORD_IS_NOT_EQUAL", message, details);
+  }
+}
+
+export class EmailNotExists extends CustomError {
+  constructor(message: string, details: null | any[] = null) {
+    super("EMAIL_NOT_EXISTS", message, details);
   }
 }

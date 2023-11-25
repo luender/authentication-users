@@ -1,19 +1,22 @@
-import { UserUseCase } from './useCase/user'
+import { UserUseCase } from "./useCase/user";
 
-import { UserService } from './service/user'
+import { UserService } from "./service/user";
 
-import { type Container, type ContainerConfig } from '../types/core'
+import { type Container, type ContainerConfig } from "../types/core";
+import { AuthService } from "./service/auth";
 
-export function createContainer (config: ContainerConfig): Container {
+export function createContainer(config: ContainerConfig): Container {
   const serviceContext = {
-    userRepository: config.userRepository
-  }
+    userRepository: config.userRepository,
+    authRepository: config.authRepository,
+  };
 
   const useCaseContext = {
-    userService: new UserService(serviceContext)
-  }
+    userService: new UserService(serviceContext),
+    authService: new AuthService(serviceContext),
+  };
 
   return {
-    userUseCase: new UserUseCase(useCaseContext)
-  }
+    userUseCase: new UserUseCase(useCaseContext),
+  };
 }

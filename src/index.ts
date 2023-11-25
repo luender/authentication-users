@@ -35,5 +35,4 @@ const app = new App({
 setImmediate(() => {
   app.run();
   Logger.debug("app initialized");
-  console.log("rodou, deu bom");
 });

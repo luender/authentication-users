@@ -3,11 +3,12 @@ import httpStatusCodes from "http-status-codes";
 
 import {
   BadRequestError,
-  EmailExisting,
+  EmailAlreadyExists,
+  EmailNotExists,
   InternalServerError,
   NotFoundError,
   PasswordIsNotEqual,
-  UserExisting,
+  UserAlreadyExists,
 } from "../../../util/http";
 
 import {
@@ -32,9 +33,10 @@ export const errorHandler = (
 
   if (
     err instanceof BadRequestError ||
-    err instanceof UserExisting ||
-    err instanceof EmailExisting ||
-    err instanceof PasswordIsNotEqual
+    err instanceof UserAlreadyExists ||
+    err instanceof EmailAlreadyExists ||
+    err instanceof PasswordIsNotEqual ||
+    err instanceof EmailNotExists
   ) {
     status = httpStatusCodes.BAD_REQUEST;
     throwErr = new BadRequestError(throwErr.message, throwErr.details);

@@ -9,7 +9,7 @@ import {
   type IHttpRoute,
 } from "../../../types/interface";
 
-import { createUser } from "../schema/user";
+import { authUser, createUser } from "../schema/user";
 
 export class UserController implements IHttpRoute {
   private readonly validator: HttpControllerConfig["validator"];
@@ -24,6 +24,9 @@ export class UserController implements IHttpRoute {
     router
       .route("/user")
       .post(this.validator(createUser), this.createUser.bind(this));
+    router
+      .route("/login")
+      .post(this.validator(authUser), this.authUser.bind(this));
   }
 
   async createUser(req: HttpRequest, res: HttpResponse, next: HttpNext) {
@@ -32,6 +35,18 @@ export class UserController implements IHttpRoute {
 
       await this.userUseCase.createUser(data);
       return res.sendStatus(httpStatus.NO_CONTENT);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async authUser(req: HttpRequest, res: HttpResponse, next: HttpNext) {
+    try {
+      const data = req.body;
+
+      const token = await this.userUseCase.authUser(data);
+
+      return res.status(httpStatus.OK).send(token);
     } catch (error) {
       return next(error);
     }

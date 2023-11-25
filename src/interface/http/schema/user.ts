@@ -1,4 +1,4 @@
-import joi from 'joi'
+import joi from "joi";
 
 export const createUser = joi.object({
   body: joi.object({
@@ -11,7 +11,7 @@ export const createUser = joi.object({
       .min(12)
       .pattern(
         new RegExp(
-          '^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}|:<>?~_-]).{12,}$'
+          "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}|:<>?~_-]).{12,}$"
         )
       )
       .required(),
@@ -20,9 +20,24 @@ export const createUser = joi.object({
       .min(12)
       .pattern(
         new RegExp(
-          '^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}|:<>?~_-]).{12,}$'
+          "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}|:<>?~_-]).{12,}$"
         )
       )
-      .required()
-  })
-})
+      .required(),
+  }),
+});
+
+export const authUser = joi.object({
+  body: {
+    email: joi.string().email().required(),
+    password: joi
+      .string()
+      .min(12)
+      .pattern(
+        new RegExp(
+          "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}|:<>?~_-]).{12,}$"
+        )
+      )
+      .required(),
+  },
+});
