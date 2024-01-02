@@ -26,18 +26,28 @@ export class UserRepository implements IUserRepository {
     try {
       const searchUser = await this.mysqlAdapter.db.where(user);
 
-      const verify = R.isEmpty(searchUser) ? null : searchUser;
+      const verify = R.isEmpty(searchUser) ? null : searchUser[0];
 
-      return verify;
+      return Object.fromEntries(verify) as User;
     } catch (error) {}
   }
 
   async getByEmail(email: Pick<User, "email">): Promise<Pick<User, "email">> {
     try {
       const searchEmail = await this.mysqlAdapter.db.where(email);
-      const verify = R.isEmpty(searchEmail) ? null : searchEmail;
+      const verify = R.isEmpty(searchEmail) ? null : searchEmail[0];
 
       return verify;
+    } catch (error) {}
+  }
+
+  async changePassword(params: Partial<User>): Promise<void> {
+    try {
+      const { email, password } = params;
+
+      await this.mysqlAdapter.db
+        .where("email", "=", email)
+        .update({ password: password });
     } catch (error) {}
   }
 }

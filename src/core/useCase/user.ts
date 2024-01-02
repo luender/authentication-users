@@ -7,37 +7,48 @@ import {
   PasswordIsNotEqual,
   EmailAlreadyExists,
   EmailNotExists,
+  EmailTokenAlreadyExists,
+  EmailTokenNotExist,
+  TokenValidationAttemptsExceeded,
+  EmailTokenInvalid,
+  TokenIsNotValidated,
 } from "../../util/http";
 import { sign } from "jsonwebtoken";
 import dayjs from "dayjs";
 import { Token } from "../../types/auth";
+import { EmailToken } from "../../types/emailToken";
+import { Chance } from "chance";
+
+const chance = new Chance();
 
 export class UserUseCase implements IUserUseCase {
   private readonly userService: UseCaseContext["userService"];
   private readonly authService: UseCaseContext["authService"];
+  private readonly emailTokenService: UseCaseContext["emailTokenService"];
 
   constructor(ctx: UseCaseContext) {
     this.userService = ctx.userService;
     this.authService = ctx.authService;
+    this.emailTokenService = ctx.emailTokenService;
   }
 
   async createUser(params: User): Promise<void> {
     try {
       const { name, lastName, user, email, password, confirmPassword } = params;
 
-      const verifiedUser = await this.userService.getByUserOrEmail({
+      const userAlreadyExists = await this.userService.getByUserOrEmail({
         user: user,
       });
 
-      if (verifiedUser) {
+      if (userAlreadyExists) {
         throw new UserAlreadyExists("User exists, try again");
       }
 
-      const verifiedEmail = await this.userService.getByUserOrEmail({
+      const emailAlreadyExists = await this.userService.getByUserOrEmail({
         email: email,
       });
 
-      if (verifiedEmail) {
+      if (emailAlreadyExists) {
         throw new EmailAlreadyExists("Email exists, try again");
       }
 
@@ -73,7 +84,7 @@ export class UserUseCase implements IUserUseCase {
 
     const passwordMatch = await bcrypt.compare(
       password,
-      emailAlreadyExists[0].password
+      emailAlreadyExists.password
     );
 
     if (!passwordMatch) {
@@ -101,5 +112,120 @@ export class UserUseCase implements IUserUseCase {
       token,
       refreshToken,
     };
+  }
+
+  async verifyEmail(params: EmailToken): Promise<void> {
+    const { email } = params;
+
+    const emailAlreadyExists = await this.userService.getByUserOrEmail({
+      email,
+    });
+
+    if (!emailAlreadyExists) {
+      throw new EmailAlreadyExists("Email not exists, try again");
+    }
+
+    const checkEmailToken = await this.emailTokenService.checkEmailToken({
+      email,
+    });
+
+    if (checkEmailToken) {
+      throw new EmailTokenAlreadyExists(
+        "The Token has already been created, please validate it"
+      );
+    }
+
+    const token = chance.string({ numeric: true, length: 6 });
+
+    await this.emailTokenService.createEmailToken({
+      email,
+      token,
+      validated: false,
+      attempts: 0,
+    });
+
+    await this.emailTokenService.sendEmailToken({
+      email,
+      token,
+    });
+  }
+
+  async validToken(params: Partial<EmailToken>): Promise<void> {
+    const { email, token } = params;
+
+    const checkEmailToken = await this.emailTokenService.checkEmailToken({
+      email,
+    });
+
+    if (!checkEmailToken) {
+      throw new EmailTokenNotExist(
+        "The email token does not exist, please create it"
+      );
+    }
+
+    if (checkEmailToken.attempts === 3) {
+      await this.emailTokenService.deleteEmailToken({ email });
+
+      throw new TokenValidationAttemptsExceeded(
+        "Number of attempts exceeded, please create a new token"
+      );
+    }
+
+    const compareToken = token === checkEmailToken.token;
+
+    if (!compareToken) {
+      await this.emailTokenService.updateAttemptsEmailToken({
+        email,
+        attempts: checkEmailToken.attempts + 1,
+      });
+
+      throw new EmailTokenInvalid("The Token sent is invalid, try again");
+    }
+
+    await this.emailTokenService.updateEmailToken({
+      email,
+      validated: true,
+    });
+  }
+
+  async changePassword(params: Partial<User>): Promise<void> {
+    const { email, password, confirmPassword } = params;
+
+    const emailAlreadyExists = await this.userService.getByUserOrEmail({
+      email,
+    });
+
+    if (!emailAlreadyExists) {
+      throw new EmailAlreadyExists("Email not exists, try again");
+    }
+
+    const comparePassword = password === confirmPassword;
+
+    if (!comparePassword) {
+      throw new PasswordIsNotEqual("Password is not equal");
+    }
+
+    const checkEmailToken = await this.emailTokenService.checkEmailToken({
+      email,
+    });
+
+    if (!checkEmailToken) {
+      throw new EmailTokenNotExist(
+        "The email token does not exist, please create it"
+      );
+    }
+
+    if (checkEmailToken.validated !== true) {
+      throw new TokenIsNotValidated(
+        "The Token has not yet been validated, please try again"
+      );
+    }
+
+    await this.userService.changePassword({
+      email,
+      password: await bcrypt.hash(password, 8),
+    });
+
+    await this.emailTokenService.deleteEmailToken({ email });
   }
 }

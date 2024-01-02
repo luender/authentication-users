@@ -27,4 +27,8 @@ export class UserService implements IUserService {
 
     return email;
   }
+
+  async changePassword(params: Partial<User>): Promise<void> {
+    await this.userRepository.changePassword(params);
+  }
 }
